@@ -143,7 +143,7 @@ func (a *Application) buildComponents() error {
 			return err
 		}
 
-		// NO Interface
+		// NO Instance
 		errNOI := failure.New(nil).
 			Set("name", name).
 			Msg("this component has no instance") //////////////////////////////////////////////////////////////////////
