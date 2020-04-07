@@ -75,7 +75,9 @@ func (s *Service) Run() error {
 }
 
 // Close AFAIRE
-func (s *Service) Close() {}
+func (s *Service) Close() {
+	s.Application.Close()
+}
 
 /*
 ######################################################################################################## @(°_°)@ #######

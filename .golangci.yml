@@ -7,5 +7,6 @@ linters:
     - funlen
     - gochecknoglobals
     - gochecknoinits
+    - gocognit
     - godox
     - gomnd
