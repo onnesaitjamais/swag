@@ -19,13 +19,13 @@ type Registry interface {
 	// Preregister AFAIRE
 	Preregister(id, name string, fn func([]int) (*registry.Service, error)) error
 	// Register AFAIRE
-	Register(id, name string, service *registry.Service) error
+	Register(service *registry.Service) error
 	// Deregister AFAIRE
 	Deregister(id, name string) error
 	// Get AFAIRE
-	Get(name string) (registry.SvcList, error)
+	Get(name string) (registry.Services, error)
 	// List AFAIRE
-	List() (registry.SvcList, error)
+	List() (registry.Services, error)
 	// Close AFAIRE
 	Close() error
 }

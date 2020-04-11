@@ -26,29 +26,29 @@ type Service struct {
 	Heartbeat  int64  `json:"heartbeat"`
 }
 
-// SvcList AFAIRE
-type SvcList []*Service
+// Services AFAIRE
+type Services []*Service
 
 // Len AFAIRE
-func (s SvcList) Len() int {
+func (s Services) Len() int {
 	return len(s)
 }
 
 // Filter AFAIRE
-func (s SvcList) Filter(fn func(*Service) bool) SvcList {
-	var sl SvcList
+func (s Services) Filter(fn func(*Service) bool) Services {
+	var result Services
 
-	for _, svc := range s {
-		if fn(svc) {
-			sl = append(sl, svc)
+	for _, service := range s {
+		if fn(service) {
+			result = append(result, service)
 		}
 	}
 
-	return sl
+	return result
 }
 
 // Shuffle AFAIRE
-func (s SvcList) Shuffle() {
+func (s Services) Shuffle() {
 	rand.Shuffle(
 		s.Len(),
 		func(i, j int) {
