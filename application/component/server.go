@@ -26,7 +26,7 @@ func NewServer() *Server {
 		ComponentBuilder: builder.NewComponentBuilder(
 			"server",
 			map[string]builder.Builder{
-				"mongodb": mongodb.Build,
+				"http": mongodb.Build,
 			},
 		),
 	}

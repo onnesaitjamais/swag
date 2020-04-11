@@ -22,9 +22,14 @@ tasks:
     cmds:
       - go build -ldflags "{{.LDFLAGS}}" -o _examples/bin/hamm _examples/hamm/hamm.go
 
+  slink:
+    cmds:
+      - go build -ldflags "{{.LDFLAGS}}" -o _examples/bin/slink _examples/slink/slink.go
+
   examples:
     cmds:
       - task: hamm
+      - task: slink
 
   default:
     cmds:
