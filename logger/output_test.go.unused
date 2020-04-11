@@ -1,0 +1,57 @@
+/*
+#######
+##        ____    _____ ____ _
+##       (_-< |/|/ / _ `/ _ `/
+##      /___/__,__/\_,_/\_, /
+##                     /___/
+##
+####### (c) 2020 Institut National de l'Audiovisuel ######################################## Archivage Numérique #######
+*/
+
+package logger
+
+import "bytes"
+
+// nopOutput
+type nopOutput struct {
+	*OutputProperties
+}
+
+func newNopOutput() *nopOutput {
+	return &nopOutput{
+		OutputProperties: NewOutputProperties(false, false, false),
+	}
+}
+
+func (o *nopOutput) Log(level Level, buf []byte) error {
+	return nil
+}
+
+func (o *nopOutput) Close() error {
+	return nil
+}
+
+// bufferOutput
+type bufferOutput struct {
+	*OutputProperties
+	bytes.Buffer
+}
+
+func newBufferOutput() *bufferOutput {
+	return &bufferOutput{
+		OutputProperties: NewOutputProperties(false, true, false),
+	}
+}
+
+func (o *bufferOutput) Log(level Level, buf []byte) error {
+	_, err := o.Write(buf)
+	return err
+}
+
+func (o *bufferOutput) Close() error {
+	return nil
+}
+
+/*
+######################################################################################################## @(°_°)@ #######
+*/

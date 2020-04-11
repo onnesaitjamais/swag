@@ -11,6 +11,7 @@
 package runner
 
 import (
+	"errors"
 	"strconv"
 	"time"
 
@@ -159,6 +160,16 @@ func (r *Runner) Server() component.Server {
 // SetServer AFAIRE
 func (r *Runner) SetServer(server component.Server) {
 	r.server = server
+}
+
+// ComponentCfg AFAIRE
+func (r *Runner) ComponentCfg(name string) (*value.Value, error) {
+	_, v, err := r.cfgValue.Get("components", name)
+	if err != nil && !errors.Is(err, value.ErrNotFound) {
+		return nil, err
+	}
+
+	return v, nil
 }
 
 /*

@@ -131,6 +131,7 @@ func (a *Application) initializeComponents(cmpts ...func() error) error {
 }
 
 func (a *Application) buildComponents() error {
+	// L'ordre de construction est important
 	for _, name := range []string{
 		"logger",
 		"config",
@@ -193,7 +194,7 @@ func (a *Application) buildComponents() error {
 				"id", a.ID(),
 				"name", a.Name(),
 				"version", a.Version(),
-				"buildDate", a.BuiltAt().String(),
+				"builtAt", a.BuiltAt().String(),
 				"instance", a.SdInstance(),
 				"pid", os.Getpid(),
 			)
