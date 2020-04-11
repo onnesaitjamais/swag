@@ -63,8 +63,8 @@ func (e *LogFmtEncoder) Encode(
 			e.buf.WriteString("{WAR} ")
 		case ELevel:
 			e.buf.WriteString("{ERR} ")
-		case FLevel:
-			e.buf.WriteString("{FAT} ")
+		case CLevel:
+			e.buf.WriteString("{CRI} ")
 		default:
 			e.buf.WriteString("{???} ")
 		}

@@ -12,7 +12,7 @@ package component
 
 import (
 	"github.com/arnumina/swag/application/component/builder"
-	"github.com/arnumina/swag/broker/mongodb"
+	"github.com/arnumina/swag/server/http"
 )
 
 // Server AFAIRE
@@ -26,7 +26,7 @@ func NewServer() *Server {
 		ComponentBuilder: builder.NewComponentBuilder(
 			"server",
 			map[string]builder.Builder{
-				"http": mongodb.Build,
+				"http": http.Build,
 			},
 		),
 	}

@@ -95,9 +95,9 @@ func (l *logger) Error(msg string, ctx ...interface{}) {
 	l.log(ELevel, msg, ctx...)
 }
 
-// Fatal AFAIRE
-func (l *logger) Fatal(msg string, ctx ...interface{}) {
-	l.log(FLevel, msg, ctx...)
+// Critical AFAIRE
+func (l *logger) Critical(msg string, ctx ...interface{}) {
+	l.log(CLevel, msg, ctx...)
 }
 
 // Close AFAIRE

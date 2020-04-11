@@ -10,20 +10,22 @@
 
 package registry
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 // Service AFAIRE
 type Service struct {
-	Name       string `json:"name"`
-	ID         string `json:"id"`
-	Version    string `json:"version"`
-	BuiltAt    int64  `json:"built_at"`
-	StartedAt  int64  `json:"started_at"`
-	FQDN       string `json:"fqdn"`
-	Port       int    `json:"port"`
-	SdInstance string `json:"sd_instance"`
-	Status     string `json:"status"`
-	Heartbeat  int64  `json:"heartbeat"`
+	Name       string
+	ID         string
+	Version    string
+	BuiltAt    int64
+	StartedAt  int64
+	FQDN       string
+	Port       int
+	SdInstance string
+	Status     string
+	Heartbeat  int64
 }
 
 // Services AFAIRE

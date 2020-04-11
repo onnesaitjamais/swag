@@ -39,8 +39,8 @@ type Logger interface {
 	Warning(msg string, ctx ...interface{})
 	// Error AFAIRE
 	Error(msg string, ctx ...interface{})
-	// Fatal AFAIRE
-	Fatal(msg string, ctx ...interface{})
+	// Critical AFAIRE
+	Critical(msg string, ctx ...interface{})
 	// Close AFAIRE
 	Close()
 	// NewStdLogger AFAIRE

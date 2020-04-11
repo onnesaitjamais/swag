@@ -31,6 +31,11 @@ type registry struct {
 	cRegistry *mongo.Collection
 }
 
+type document struct {
+	ID      string             `bson:"_id"`
+	Service *_registry.Service `bson:"service"`
+}
+
 func (r *registry) build() (*registry, error) {
 	client := mongodb.NewClient("swag.registry", r.uri)
 
@@ -63,9 +68,7 @@ func (r *registry) lock(owner string) error {
 				{Key: "_id", Value: "registry"},
 				{Key: "locked", Value: false},
 			},
-			bson.M{
-				"$set": bson.M{"locked": true, "owner": owner},
-			},
+			bson.M{"$set": bson.M{"locked": true, "owner": owner}},
 		)
 
 		err := result.Err()
@@ -89,13 +92,32 @@ func (r *registry) unlock(owner string) {
 			{Key: "locked", Value: true},
 			{Key: "owner", Value: owner},
 		},
-		bson.M{
-			"$set": bson.M{"locked": false},
-		},
+		bson.M{"$set": bson.M{"locked": false}},
 	)
 	if err != nil {
 		util.Alert(err)
 	}
+}
+
+func (r *registry) find(ctx context.Context, filter interface{}) (_registry.Services, error) {
+	cursor, err := r.cRegistry.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var ds []document
+
+	if err = cursor.All(r.cMongo.Context(), &ds); err != nil {
+		return nil, err
+	}
+
+	var s _registry.Services
+
+	for _, d := range ds {
+		s = append(s, d.Service)
+	}
+
+	return s, nil
 }
 
 // Preregister AFAIRE
@@ -108,14 +130,8 @@ func (r *registry) Preregister(id, name string, fn func([]int) (*_registry.Servi
 
 	defer r.unlock(owner)
 
-	cursor, err := r.cRegistry.Find(r.cMongo.Context(), bson.D{})
+	services, err := r.find(r.cMongo.Context(), bson.M{"service.port": bson.M{"$gt": 0}})
 	if err != nil {
-		return err
-	}
-
-	var services _registry.Services
-
-	if err = cursor.All(r.cMongo.Context(), &services); err != nil {
 		return err
 	}
 
@@ -130,7 +146,12 @@ func (r *registry) Preregister(id, name string, fn func([]int) (*_registry.Servi
 		return err
 	}
 
-	_, err = r.cRegistry.InsertOne(r.cMongo.Context(), service)
+	d := &document{
+		ID:      service.ID,
+		Service: service,
+	}
+
+	_, err = r.cRegistry.InsertOne(r.cMongo.Context(), d)
 
 	return err
 }
@@ -140,7 +161,7 @@ func (r *registry) Register(service *_registry.Service) error {
 	_, err := r.cRegistry.UpdateOne(
 		r.cMongo.Context(),
 		bson.M{"_id": service.ID},
-		bson.M{"$set": service},
+		bson.M{"$set": bson.M{"service": service}},
 		options.Update().SetUpsert(true),
 	)
 
@@ -157,44 +178,14 @@ func (r *registry) Deregister(id, _ string) error {
 	return err
 }
 
-// Get AFAIRE
-func (r *registry) Get(name string) (_registry.Services, error) {
-	cursor, err := r.cRegistry.Find(
-		r.cMongo.Context(),
-		bson.D{
-			{Key: "name", Value: name},
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	var services _registry.Services
-
-	if err = cursor.All(r.cMongo.Context(), &services); err != nil {
-		return nil, err
-	}
-
-	return services, nil
+// Find AFAIRE
+func (r *registry) Find(name string) (_registry.Services, error) {
+	return r.find(r.cMongo.Context(), bson.D{{Key: "name", Value: name}})
 }
 
 // List AFAIRE
 func (r *registry) List() (_registry.Services, error) {
-	cursor, err := r.cRegistry.Find(
-		r.cMongo.Context(),
-		bson.D{},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	var services _registry.Services
-
-	if err = cursor.All(r.cMongo.Context(), &services); err != nil {
-		return nil, err
-	}
-
-	return services, nil
+	return r.find(r.cMongo.Context(), bson.D{})
 }
 
 // Close AFAIRE

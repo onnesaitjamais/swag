@@ -27,8 +27,8 @@ const (
 	WLevel
 	// Error
 	ELevel
-	// Fatal
-	FLevel
+	// Critical
+	CLevel
 )
 
 // GetLevelFromString retourne le niveau de log correspondant à la chaîne de caractères
@@ -47,8 +47,8 @@ func GetLevelFromString(level string) Level {
 		return WLevel
 	case "error":
 		return ELevel
-	case "fatal":
-		return FLevel
+	case "critical":
+		return CLevel
 	default:
 		return TLevel
 	}

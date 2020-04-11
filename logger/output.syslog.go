@@ -66,7 +66,7 @@ func (o *SyslogOutput) Log(level Level, buf []byte) error {
 		return o.Warning(string(buf))
 	case ELevel:
 		return o.Err(string(buf))
-	case FLevel:
+	case CLevel:
 		return o.Crit(string(buf))
 	default:
 		return o.Debug(string(buf)) // TRACE & DEBUG

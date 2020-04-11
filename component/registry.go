@@ -23,7 +23,7 @@ type Registry interface {
 	// Deregister AFAIRE
 	Deregister(id, name string) error
 	// Get AFAIRE
-	Get(name string) (registry.Services, error)
+	Find(name string) (registry.Services, error)
 	// List AFAIRE
 	List() (registry.Services, error)
 	// Close AFAIRE

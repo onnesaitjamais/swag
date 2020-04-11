@@ -23,7 +23,8 @@ import (
 // Service AFAIRE
 type Service struct {
 	*application.Application
-	group workgroup.Group
+	group      workgroup.Group
+	registered bool
 }
 
 // New AFAIRE
@@ -38,8 +39,7 @@ func (s *Service) AddGroupFn(fn func(<-chan struct{}) error) {
 	s.group.Add(fn)
 }
 
-// RunGroup AFAIRE
-func (s *Service) RunGroup() error {
+func (s *Service) runGroup() error {
 	logger := s.Logger()
 
 	s.AddGroupFn(
@@ -69,8 +69,37 @@ func (s *Service) RunGroup() error {
 	return s.group.Run()
 }
 
+func (s *Service) run() error {
+	if err := s.preregister(); err != nil {
+		return err
+	}
+
+	defer s.deregister()
+
+	if err := s.maybeSetupServer(); err != nil {
+		return err
+	}
+
+	s.register()
+
+	if err := s.runGroup(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Run AFAIRE
 func (s *Service) Run() error {
+	if err := s.run(); err != nil {
+		s.Logger().Critical( //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+			"Runtime error",
+			"reason", err.Error(),
+		)
+
+		return err
+	}
+
 	return nil
 }
 
