@@ -39,45 +39,46 @@ func (s *Service) updateRegistryService(service *_registry.Service) {
 }
 
 func (s *Service) preregister() error {
-	if s.Config().Port() == 0 {
-		find := func(used []int) (*_registry.Service, error) {
-			config := s.Config()
+	config := s.Config()
 
-			min := config.PortMin()
-			max := config.PortMax()
+	if config.Port() != 0 {
+		s.Logger().Info("Config", "port", s.Config().Port()) //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+		return nil
+	}
 
-			for i := min; i <= max; i++ {
-				port := rand.Intn(max-min+1) + min
+	assign := func(used []int) (*_registry.Service, error) {
+		min := config.PortMin()
+		max := config.PortMax()
 
-				for _, p := range used {
-					if p == port {
-						port = 0
-						break
-					}
-				}
+		for i := min; i <= max; i++ {
+			port := rand.Intn(max-min+1) + min
 
-				if port != 0 {
-					config.SetPort(port)
-					s.Logger().Info("Assignment", "port", port) //::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-					return s.newRegistryService(port, "starting"), nil
+			for _, p := range used {
+				if p == port {
+					port = 0
+					break
 				}
 			}
 
-			return nil, failure.New(nil).
-				Set("min", min).
-				Set("max", max).
-				Msg("impossible to retrieve a free TCP port") //////////////////////////////////////////////////////////
+			if port != 0 {
+				config.SetPort(port)
+				s.Logger().Info("Assignment", "port", port) //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+				return s.newRegistryService(port, "starting"), nil
+			}
 		}
 
-		if err := s.Registry().Preregister(s.ID(), s.Name(), find); err != nil {
-			return err
-		}
-
-		s.registered = true
-	} else {
-		s.Logger().Info("Config", "port", s.Config().Port()) //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+		return nil, failure.New(nil).
+			Set("min", min).
+			Set("max", max).
+			Msg("impossible to retrieve a free TCP port") //////////////////////////////////////////////////////////////
 	}
+
+	if err := s.Registry().Preregister(s.ID(), s.Name(), assign); err != nil {
+		return err
+	}
+
+	s.registered = true
 
 	return nil
 }
@@ -106,8 +107,12 @@ func (s *Service) register() {
 				case <-time.After(interval):
 					s.updateRegistryService(service)
 					if err := registry.Register(service); err != nil {
-						s.deregister()
-						return err
+						s.Logger().Warning( //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+							"Impossible to register the service",
+							"id", s.ID(),
+							"name", s.Name(),
+							"reason", err.Error(),
+						)
 					}
 				}
 			}

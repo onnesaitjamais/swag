@@ -122,7 +122,7 @@ func (r *registry) find(ctx context.Context, filter interface{}) (_registry.Serv
 
 // Preregister AFAIRE
 func (r *registry) Preregister(id, name string, fn func([]int) (*_registry.Service, error)) error {
-	owner := name + "/" + id
+	owner := id + "@" + name
 
 	if err := r.lock(owner); err != nil {
 		return err
