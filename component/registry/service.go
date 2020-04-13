@@ -12,6 +12,7 @@ package registry
 
 import (
 	"math/rand"
+	"time"
 )
 
 // Service AFAIRE
@@ -19,13 +20,13 @@ type Service struct {
 	Name       string
 	ID         string
 	Version    string
-	BuiltAt    int64
-	StartedAt  int64
+	BuiltAt    time.Time
+	StartedAt  time.Time
 	FQDN       string
 	Port       int
 	SdInstance string
 	Status     string
-	Heartbeat  int64
+	Heartbeat  time.Time
 }
 
 // Services AFAIRE

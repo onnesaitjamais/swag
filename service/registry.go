@@ -24,18 +24,18 @@ func (s *Service) newRegistryService(port int, status string) *_registry.Service
 		Name:       s.Name(),
 		ID:         s.ID(),
 		Version:    s.Version(),
-		BuiltAt:    s.BuiltAt().Unix(),
-		StartedAt:  s.StartedAt().Unix(),
+		BuiltAt:    s.BuiltAt(),
+		StartedAt:  s.StartedAt(),
 		FQDN:       s.FQDN(),
 		Port:       port,
 		SdInstance: s.SdInstance(),
 		Status:     status,
-		Heartbeat:  time.Now().Unix(),
+		Heartbeat:  time.Now(),
 	}
 }
 
 func (s *Service) updateRegistryService(service *_registry.Service) {
-	service.Heartbeat = time.Now().Unix()
+	service.Heartbeat = time.Now()
 }
 
 func (s *Service) preregister() error {
