@@ -26,10 +26,15 @@ tasks:
     cmds:
       - go build -ldflags "{{.LDFLAGS}}" -o _examples/bin/slink _examples/slink/slink.go
 
+  potato:
+    cmds:
+      - go build -ldflags "{{.LDFLAGS}}" -o _examples/bin/potato _examples/potato/potato.go
+
   examples:
     cmds:
       - task: hamm
       - task: slink
+      - task: potato
 
   default:
     cmds:

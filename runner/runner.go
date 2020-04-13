@@ -15,6 +15,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/heptio/workgroup"
+
 	"github.com/arnumina/swag/component"
 	"github.com/arnumina/swag/util"
 	"github.com/arnumina/swag/util/value"
@@ -30,7 +32,9 @@ type Runner struct {
 	fqdn       string
 	sdInstance string
 	cfgValue   *value.Value
-	//// Les composants /////
+
+	group workgroup.Group
+
 	broker   component.Broker
 	config   component.Config
 	logger   component.Logger
@@ -110,6 +114,16 @@ func (r *Runner) CfgValue() *value.Value {
 // SetCfgValue AFAIRE
 func (r *Runner) SetCfgValue(cfg *value.Value) {
 	r.cfgValue = cfg
+}
+
+// AddGroupFn AFAIRE
+func (r *Runner) AddGroupFn(fn func(<-chan struct{}) error) {
+	r.group.Add(fn)
+}
+
+// RunGroup AFAIRE
+func (r *Runner) RunGroup() error {
+	return r.group.Run()
 }
 
 // Broker AFAIRE

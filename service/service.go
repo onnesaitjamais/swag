@@ -17,13 +17,11 @@ import (
 
 	"github.com/arnumina/swag/application"
 	"github.com/arnumina/swag/util/systemd"
-	"github.com/heptio/workgroup"
 )
 
 // Service AFAIRE
 type Service struct {
 	*application.Application
-	group      workgroup.Group
 	registered bool
 }
 
@@ -32,11 +30,6 @@ func New(application *application.Application) *Service {
 	return &Service{
 		Application: application,
 	}
-}
-
-// AddGroupFn AFAIRE
-func (s *Service) AddGroupFn(fn func(<-chan struct{}) error) {
-	s.group.Add(fn)
 }
 
 func (s *Service) runGroup() error {
@@ -66,7 +59,7 @@ func (s *Service) runGroup() error {
 		},
 	)
 
-	return s.group.Run()
+	return s.RunGroup()
 }
 
 func (s *Service) run() error {

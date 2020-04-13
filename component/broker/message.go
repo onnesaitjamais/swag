@@ -8,20 +8,15 @@
 ####### (c) 2020 Institut National de l'Audiovisuel ######################################## Archivage Numérique #######
 */
 
-package component
+package broker
 
-import (
-	"github.com/arnumina/swag/component/broker"
-)
+import "time"
 
-// Broker AFAIRE
-type Broker interface {
-	// Publish AFAIRE
-	Publish(event string, data interface{}) error
-	// Subscribe AFAIRE
-	Subscribe(queue string, fn func(*broker.Message) bool)
-	// Close AFAIRE
-	Close() error
+// Message AFAIRE
+type Message struct {
+	Event     string
+	Payload   interface{}
+	CreatedAt time.Time
 }
 
 /*
