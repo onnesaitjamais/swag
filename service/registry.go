@@ -84,42 +84,44 @@ func (s *Service) preregister() error {
 }
 
 func (s *Service) register() {
-	s.AddGroupFn(func(stop <-chan struct{}) error {
-		registry := s.Registry()
-		service := s.newRegistryService(s.Config().Port(), "running")
+	s.AddGroupFn(
+		func(stop <-chan struct{}) error {
+			registry := s.Registry()
+			service := s.newRegistryService(s.Config().Port(), "running")
 
-		if err := registry.Register(service); err != nil {
-			return err
-		}
+			if err := registry.Register(service); err != nil {
+				return err
+			}
 
-		s.registered = true
+			s.registered = true
 
-		if registry.Interval() == 0 {
-			<-stop
-		} else {
-			interval := time.Duration(registry.Interval()) * time.Second
+			if registry.Interval() == 0 {
+				<-stop
+			} else {
+				interval := time.Duration(registry.Interval()) * time.Second
 
-			for {
-				select {
-				case <-stop:
-					s.deregister()
-					return nil
-				case <-time.After(interval):
-					s.updateRegistryService(service)
-					if err := registry.Register(service); err != nil {
-						s.Logger().Warning( //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-							"Impossible to register the service",
-							"id", s.ID(),
-							"name", s.Name(),
-							"reason", err.Error(),
-						)
+				for {
+					select {
+					case <-stop:
+						s.deregister()
+						return nil
+					case <-time.After(interval):
+						s.updateRegistryService(service)
+						if err := registry.Register(service); err != nil {
+							s.Logger().Warning( //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+								"Impossible to register the service",
+								"id", s.ID(),
+								"name", s.Name(),
+								"reason", err.Error(),
+							)
+						}
 					}
 				}
 			}
-		}
 
-		return nil
-	})
+			return nil
+		},
+	)
 }
 
 func (s *Service) deregister() {
