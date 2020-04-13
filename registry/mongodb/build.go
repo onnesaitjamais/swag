@@ -84,7 +84,9 @@ func Build(opts options.Options, runner *runner.Runner) (interface{}, error) {
 		return nil, err
 	}
 
-	registry := &registry{}
+	registry := &registry{
+		runner: runner,
+	}
 
 	if err := registry.setInterval(opts, runner.Name(), cfg); err != nil {
 		return nil, err

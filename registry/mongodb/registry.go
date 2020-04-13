@@ -19,11 +19,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	_registry "github.com/arnumina/swag/component/registry"
+	"github.com/arnumina/swag/runner"
 	"github.com/arnumina/swag/util"
+	"github.com/arnumina/swag/util/failure"
 	"github.com/arnumina/swag/util/mongodb"
 )
 
 type registry struct {
+	runner     *runner.Runner
 	interval   int
 	uri        string
 	clMongo    *mongodb.Client
@@ -32,8 +35,8 @@ type registry struct {
 }
 
 type document struct {
-	ID      string             `bson:"_id"`
-	Service *_registry.Service `bson:"service"`
+	ID      string `bson:"_id"`
+	Service *_registry.Service
 }
 
 func (r *registry) build() (*registry, error) {
@@ -62,7 +65,7 @@ func (r *registry) lock(owner string) error {
 	defer cancel()
 
 	for {
-		result := r.coMutex.FindOneAndUpdate(
+		result, err := r.coMutex.UpdateOne(
 			ctx,
 			bson.D{
 				{Key: "_id", Value: "registry"},
@@ -70,14 +73,12 @@ func (r *registry) lock(owner string) error {
 			},
 			bson.M{"$set": bson.M{"locked": true, "owner": owner}},
 		)
-
-		err := result.Err()
-		if err == nil {
-			return nil
+		if err != nil {
+			return err
 		}
 
-		if err != mongo.ErrNoDocuments {
-			return err
+		if result.ModifiedCount != 0 {
+			return nil
 		}
 
 		time.Sleep(50 * time.Millisecond)
@@ -95,7 +96,15 @@ func (r *registry) unlock(owner string) {
 		bson.M{"$set": bson.M{"locked": false}},
 	)
 	if err != nil {
-		util.Alert(err)
+		f := failure.New(err).
+			Set("component", "registry").
+			Set("collection", r.coMutex.Name()).
+			Set("document", "registry").
+			Msg("Impossible to unlock the single document") ////////////////////////////////////////////////////////////
+
+		r.runner.Logger().Error(f.Error())
+
+		util.Alert(f)
 	}
 }
 
@@ -180,7 +189,7 @@ func (r *registry) Deregister(id, _ string) error {
 
 // Find AFAIRE
 func (r *registry) Find(name string) (_registry.Services, error) {
-	return r.find(r.clMongo.Context(), bson.D{{Key: "name", Value: name}})
+	return r.find(r.clMongo.Context(), bson.M{"name": name})
 }
 
 // List AFAIRE
