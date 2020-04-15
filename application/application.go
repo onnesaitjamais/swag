@@ -49,7 +49,7 @@ func (a *Application) printVersion() {
 		"swag.%s version %s built at %s by Archivage Numérique © INA %d\n\n",
 		a.Name(),
 		a.Version(),
-		a.BuiltAt().String(),
+		a.BuiltAt().Local().String(),
 		time.Now().Year(),
 	)
 }
