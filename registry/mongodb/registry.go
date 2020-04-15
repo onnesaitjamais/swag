@@ -27,7 +27,7 @@ import (
 
 type registry struct {
 	runner     *runner.Runner
-	interval   int
+	interval   time.Duration
 	uri        string
 	clMongo    *mongodb.Client
 	coMutex    *mongo.Collection
@@ -56,7 +56,7 @@ func (r *registry) build() (*registry, error) {
 }
 
 // Interval AFAIRE
-func (r *registry) Interval() int {
+func (r *registry) Interval() time.Duration {
 	return r.interval
 }
 

@@ -10,12 +10,16 @@
 
 package component
 
-import "github.com/arnumina/swag/component/registry"
+import (
+	"time"
+
+	"github.com/arnumina/swag/component/registry"
+)
 
 // Registry AFAIRE
 type Registry interface {
 	// Interval AFAIRE
-	Interval() int
+	Interval() time.Duration
 	// Preregister AFAIRE
 	Preregister(id, name string, fn func([]int) (*registry.Service, error)) error
 	// Register AFAIRE

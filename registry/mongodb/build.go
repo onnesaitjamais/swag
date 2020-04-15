@@ -11,6 +11,8 @@
 package mongodb
 
 import (
+	"time"
+
 	"github.com/arnumina/swag/runner"
 	"github.com/arnumina/swag/util/failure"
 	"github.com/arnumina/swag/util/options"
@@ -41,7 +43,7 @@ func (r *registry) setInterval(opts options.Options, runner string, cfg *value.V
 		return err
 	}
 
-	r.interval = interval
+	r.interval = time.Duration(interval) * time.Second
 
 	return nil
 }

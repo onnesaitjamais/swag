@@ -98,7 +98,7 @@ func (s *Service) register() {
 			if registry.Interval() == 0 {
 				<-stop
 			} else {
-				interval := time.Duration(registry.Interval()) * time.Second
+				interval := registry.Interval()
 
 				for {
 					select {
