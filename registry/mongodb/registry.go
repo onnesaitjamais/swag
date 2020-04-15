@@ -189,7 +189,7 @@ func (r *registry) Deregister(id, _ string) error {
 
 // Find AFAIRE
 func (r *registry) Find(name string) (_registry.Services, error) {
-	return r.find(r.clMongo.Context(), bson.M{"name": name})
+	return r.find(r.clMongo.Context(), bson.M{"service.name": name})
 }
 
 // List AFAIRE
