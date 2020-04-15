@@ -29,11 +29,11 @@ import (
 
 const (
 	_maxPendingDocuments = 100
-	_maxNoMsgTimeout     = 2
-	_noMsgDelay          = 50
-	_maxErrorTimeout     = 10
+	_errorTimeout        = 10 // s
+	_maxNoMsgTimeout     = 2  // s
+	_noMsgDelay          = 50 // ms
 	_maxRetries          = 3
-	_retryDelay          = 30
+	_retryDelay          = 10 // s
 )
 
 type broker struct {
@@ -261,7 +261,7 @@ func (b *broker) nack(co *mongo.Collection, d *document) {
 func (b *broker) consume(td time.Duration, co *mongo.Collection, fn func(*_broker.Message) bool) time.Duration {
 	d, err := b.findOne(co)
 	if err != nil {
-		return _maxErrorTimeout * time.Second
+		return _errorTimeout * time.Second
 	}
 
 	if d == nil {
