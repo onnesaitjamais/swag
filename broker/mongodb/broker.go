@@ -145,7 +145,7 @@ func (b *broker) enqueue(queue string, d *document) {
 }
 
 // Publish AFAIRE
-func (b *broker) Publish(event string, data interface{}) error {
+func (b *broker) Publish(event string, data interface{}) {
 	d := &document{
 		ID:       util.NewUUID(),
 		Booked:   false,
@@ -172,8 +172,6 @@ func (b *broker) Publish(event string, data interface{}) error {
 			}
 		}
 	}
-
-	return nil
 }
 
 func (b *broker) findOne(co *mongo.Collection) (*document, error) {

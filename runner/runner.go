@@ -176,14 +176,23 @@ func (r *Runner) SetServer(server component.Server) {
 	r.server = server
 }
 
-// ComponentCfg AFAIRE
-func (r *Runner) ComponentCfg(name string) (*value.Value, error) {
-	_, v, err := r.cfgValue.Get("components", name)
+func (r *Runner) cfg(keys ...string) (*value.Value, error) {
+	_, v, err := r.cfgValue.Get(keys...)
 	if err != nil && !errors.Is(err, value.ErrNotFound) {
 		return nil, err
 	}
 
 	return v, nil
+}
+
+// ComponentCfg AFAIRE
+func (r *Runner) ComponentCfg(name string) (*value.Value, error) {
+	return r.cfg("components", name)
+}
+
+// ServiceCfg AFAIRE
+func (r *Runner) ServiceCfg(name string) (*value.Value, error) {
+	return r.cfg("services", name)
 }
 
 /*

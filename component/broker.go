@@ -17,7 +17,7 @@ import (
 // Broker AFAIRE
 type Broker interface {
 	// Publish AFAIRE
-	Publish(event string, data interface{}) error
+	Publish(event string, data interface{})
 	// Subscribe AFAIRE
 	Subscribe(queue string, fn func(*broker.Message) bool)
 	// Close AFAIRE
