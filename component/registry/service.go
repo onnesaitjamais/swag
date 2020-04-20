@@ -28,7 +28,7 @@ type Service struct {
 	SdInstance string
 	Status     string
 	Heartbeat  time.Time
-	Interval   time.Duration
+	Interval   int
 }
 
 // Services AFAIRE

@@ -31,7 +31,7 @@ func (s *Service) newRegistryService(port int, status string) *_registry.Service
 		SdInstance: s.SdInstance(),
 		Status:     status,
 		Heartbeat:  time.Now(),
-		Interval:   s.Registry().Interval(),
+		Interval:   int(s.Registry().Interval().Seconds()),
 	}
 }
 
