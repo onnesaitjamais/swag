@@ -12,13 +12,14 @@ package registry
 
 import (
 	"math/rand"
+	"sort"
 	"time"
 )
 
 // Service AFAIRE
 type Service struct {
-	Name       string
 	ID         string
+	Name       string
 	Version    string
 	BuiltAt    time.Time
 	StartedAt  time.Time
@@ -59,6 +60,64 @@ func (s Services) Shuffle() {
 			s[i], s[j] = s[j], s[i]
 		},
 	)
+}
+
+type lessFunc func(si, sj *Service) bool
+
+type multiSorter struct {
+	data Services
+	less []lessFunc
+}
+
+func (ms *multiSorter) Len() int {
+	return len(ms.data)
+}
+
+func (ms *multiSorter) Swap(i, j int) {
+	ms.data[i], ms.data[j] = ms.data[j], ms.data[i]
+}
+
+func (ms *multiSorter) Less(i, j int) bool {
+	di, dj := ms.data[i], ms.data[j]
+
+	var k int
+	for k = 0; k < len(ms.less)-1; k++ {
+		less := ms.less[k]
+
+		switch {
+		case less(di, dj):
+			return true
+		case less(dj, di):
+			return false
+		}
+	}
+
+	return ms.less[k](di, dj)
+}
+
+// Sort AFAIRE
+func (s Services) Sort(fields ...string) {
+	less := []lessFunc{}
+
+	for _, field := range fields {
+		switch field {
+		case "ID":
+			less = append(less, func(si, sj *Service) bool { return si.ID < sj.ID })
+		case "Name":
+			less = append(less, func(si, sj *Service) bool { return si.Name < sj.Name })
+		case "FQDN":
+			less = append(less, func(si, sj *Service) bool { return si.FQDN < sj.FQDN })
+		case "Port":
+			less = append(less, func(si, sj *Service) bool { return si.Port < sj.Port })
+		}
+	}
+
+	ms := &multiSorter{
+		data: s,
+		less: less,
+	}
+
+	sort.Sort(ms)
 }
 
 /*
