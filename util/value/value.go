@@ -146,10 +146,6 @@ func (v *Value) Bool(keys ...string) (bool, error) {
 
 // DBool AFAIRE
 func (v *Value) DBool(d bool, keys ...string) (bool, error) {
-	if v == nil {
-		return d, nil
-	}
-
 	value, err := v.Bool(keys...)
 	if errors.Is(err, ErrNotFound) {
 		return d, nil
@@ -178,10 +174,6 @@ func (v *Value) Int(keys ...string) (int, error) {
 
 // DInt AFAIRE
 func (v *Value) DInt(d int, keys ...string) (int, error) {
-	if v == nil {
-		return d, nil
-	}
-
 	value, err := v.Int(keys...)
 	if errors.Is(err, ErrNotFound) {
 		return d, nil
@@ -210,10 +202,6 @@ func (v *Value) String(keys ...string) (string, error) {
 
 // DString AFAIRE
 func (v *Value) DString(d string, keys ...string) (string, error) {
-	if v == nil {
-		return d, nil
-	}
-
 	value, err := v.String(keys...)
 	if errors.Is(err, ErrNotFound) {
 		return d, nil
