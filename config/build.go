@@ -14,7 +14,6 @@ import (
 	"github.com/arnumina/swag/runner"
 	"github.com/arnumina/swag/util/failure"
 	"github.com/arnumina/swag/util/options"
-	"github.com/arnumina/swag/util/value"
 )
 
 const (
@@ -23,10 +22,10 @@ const (
 	_defaultPortMin = 65000
 )
 
-func (c *config) setPort(opts options.Options, runner string, cfg *value.Value) error {
+func (c *config) setPort(opts options.Options, runner *runner.Runner) error {
 	const option = "port"
 
-	d, err := cfg.DInt(_defaultPort, option)
+	d, err := runner.CfgValue().DInt(_defaultPort, "services", runner.Name(), option)
 	if err != nil {
 		return err
 	}
@@ -34,7 +33,7 @@ func (c *config) setPort(opts options.Options, runner string, cfg *value.Value) 
 	opts.SetOption(
 		option,
 		"CONFIG_PORT",
-		runner,
+		runner.Name(),
 		d,
 	)
 
@@ -48,10 +47,10 @@ func (c *config) setPort(opts options.Options, runner string, cfg *value.Value) 
 	return nil
 }
 
-func (c *config) setPortMax(opts options.Options, runner string, cfg *value.Value) error {
+func (c *config) setPortMax(opts options.Options, runner *runner.Runner) error {
 	const option = "port_max"
 
-	d, err := cfg.DInt(_defaultPortMax, option)
+	d, err := runner.CfgValue().DInt(_defaultPortMax, "components", "config", option)
 	if err != nil {
 		return err
 	}
@@ -59,7 +58,7 @@ func (c *config) setPortMax(opts options.Options, runner string, cfg *value.Valu
 	opts.SetOption(
 		option,
 		"CONFIG_PORT_MAX",
-		runner,
+		runner.Name(),
 		d,
 	)
 
@@ -73,10 +72,10 @@ func (c *config) setPortMax(opts options.Options, runner string, cfg *value.Valu
 	return nil
 }
 
-func (c *config) setPortMin(opts options.Options, runner string, cfg *value.Value) error {
+func (c *config) setPortMin(opts options.Options, runner *runner.Runner) error {
 	const option = "port_min"
 
-	d, err := cfg.DInt(_defaultPortMin, option)
+	d, err := runner.CfgValue().DInt(_defaultPortMin, "components", "config", option)
 	if err != nil {
 		return err
 	}
@@ -84,7 +83,7 @@ func (c *config) setPortMin(opts options.Options, runner string, cfg *value.Valu
 	opts.SetOption(
 		option,
 		"CONFIG_PORT_MIN",
-		runner,
+		runner.Name(),
 		d,
 	)
 
@@ -100,22 +99,17 @@ func (c *config) setPortMin(opts options.Options, runner string, cfg *value.Valu
 
 // Build AFAIRE
 func Build(opts options.Options, runner *runner.Runner) (interface{}, error) {
-	cfg, err := runner.ComponentCfg("config")
-	if err != nil {
-		return nil, err
-	}
-
 	config := &config{}
 
-	if err := config.setPort(opts, runner.Name(), cfg); err != nil {
+	if err := config.setPort(opts, runner); err != nil {
 		return nil, err
 	}
 
-	if err := config.setPortMax(opts, runner.Name(), cfg); err != nil {
+	if err := config.setPortMax(opts, runner); err != nil {
 		return nil, err
 	}
 
-	if err := config.setPortMin(opts, runner.Name(), cfg); err != nil {
+	if err := config.setPortMin(opts, runner); err != nil {
 		return nil, err
 	}
 
