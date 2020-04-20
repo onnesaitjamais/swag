@@ -16,7 +16,6 @@ import (
 	"github.com/arnumina/swag/runner"
 	"github.com/arnumina/swag/util/failure"
 	"github.com/arnumina/swag/util/options"
-	"github.com/arnumina/swag/util/value"
 )
 
 const (
@@ -47,19 +46,14 @@ func (s *server) setHandler(opts options.Options) error {
 	return nil
 }
 
-func (s *server) setLocal(opts options.Options, runner string, cfg *value.Value) error {
+func (s *server) setLocal(opts options.Options, runner *runner.Runner) error {
 	const option = "local"
-
-	d, err := cfg.DBool(_defaultLocal, option)
-	if err != nil {
-		return err
-	}
 
 	opts.SetOption(
 		option,
 		"SERVER_LOCAL",
-		runner,
-		d,
+		runner.Name(),
+		_defaultLocal,
 	)
 
 	local, err := opts.Bool(option)
@@ -72,19 +66,14 @@ func (s *server) setLocal(opts options.Options, runner string, cfg *value.Value)
 	return nil
 }
 
-func (s *server) setHealthURI(opts options.Options, runner string, cfg *value.Value) error {
+func (s *server) setHealthURI(opts options.Options, runner *runner.Runner) error {
 	const option = "health_URI"
-
-	d, err := cfg.DString(_defaultHealthURI, option)
-	if err != nil {
-		return err
-	}
 
 	opts.SetOption(
 		option,
 		"SERVER_HEALTH_URI",
-		runner,
-		d,
+		runner.Name(),
+		_defaultHealthURI,
 	)
 
 	healthURI, err := opts.String(option)
@@ -97,19 +86,14 @@ func (s *server) setHealthURI(opts options.Options, runner string, cfg *value.Va
 	return nil
 }
 
-func (s *server) setTLS(opts options.Options, runner string, cfg *value.Value) error {
+func (s *server) setTLS(opts options.Options, runner *runner.Runner) error {
 	const option = "TLS"
-
-	d, err := cfg.DBool(_defaultTLS, option)
-	if err != nil {
-		return err
-	}
 
 	opts.SetOption(
 		option,
 		"SERVER_TLS",
-		runner,
-		d,
+		runner.Name(),
+		_defaultTLS,
 	)
 
 	tls, err := opts.Bool(option)
@@ -122,19 +106,14 @@ func (s *server) setTLS(opts options.Options, runner string, cfg *value.Value) e
 	return nil
 }
 
-func (s *server) setCertFile(opts options.Options, runner string, cfg *value.Value) error {
+func (s *server) setCertFile(opts options.Options, runner *runner.Runner) error {
 	const option = "cert_file"
-
-	d, err := cfg.DString("", option)
-	if err != nil {
-		return err
-	}
 
 	opts.SetOption(
 		option,
 		"SERVER_CERT_FILE",
-		runner,
-		d,
+		runner.Name(),
+		"",
 	)
 
 	certFile, err := opts.String(option)
@@ -153,19 +132,14 @@ func (s *server) setCertFile(opts options.Options, runner string, cfg *value.Val
 	return nil
 }
 
-func (s *server) setKeyFile(opts options.Options, runner string, cfg *value.Value) error {
+func (s *server) setKeyFile(opts options.Options, runner *runner.Runner) error {
 	const option = "key_file"
-
-	d, err := cfg.DString("", option)
-	if err != nil {
-		return err
-	}
 
 	opts.SetOption(
 		option,
 		"SERVER_KEY_FILE",
-		runner,
-		d,
+		runner.Name(),
+		"",
 	)
 
 	keyFile, err := opts.String(option)
@@ -186,11 +160,6 @@ func (s *server) setKeyFile(opts options.Options, runner string, cfg *value.Valu
 
 // Build AFAIRE
 func Build(opts options.Options, runner *runner.Runner) (interface{}, error) {
-	cfg, err := runner.ComponentCfg("server")
-	if err != nil {
-		return nil, err
-	}
-
 	server := &server{
 		server: &http.Server{},
 	}
@@ -199,24 +168,24 @@ func Build(opts options.Options, runner *runner.Runner) (interface{}, error) {
 		return nil, err
 	}
 
-	if err := server.setLocal(opts, runner.Name(), cfg); err != nil {
+	if err := server.setLocal(opts, runner); err != nil {
 		return nil, err
 	}
 
-	if err := server.setHealthURI(opts, runner.Name(), cfg); err != nil {
+	if err := server.setHealthURI(opts, runner); err != nil {
 		return nil, err
 	}
 
-	if err := server.setTLS(opts, runner.Name(), cfg); err != nil {
+	if err := server.setTLS(opts, runner); err != nil {
 		return nil, err
 	}
 
 	if server.tls {
-		if err := server.setCertFile(opts, runner.Name(), cfg); err != nil {
+		if err := server.setCertFile(opts, runner); err != nil {
 			return nil, err
 		}
 
-		if err := server.setKeyFile(opts, runner.Name(), cfg); err != nil {
+		if err := server.setKeyFile(opts, runner); err != nil {
 			return nil, err
 		}
 	}

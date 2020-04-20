@@ -16,13 +16,12 @@ import (
 	"github.com/arnumina/swag/runner"
 	"github.com/arnumina/swag/util/failure"
 	"github.com/arnumina/swag/util/options"
-	"github.com/arnumina/swag/util/value"
 )
 
-func (b *broker) setURI(opts options.Options, runner string, cfg *value.Value) error {
+func (b *broker) setURI(opts options.Options, runner *runner.Runner) error {
 	const option = "URI"
 
-	d, err := cfg.DString("", option)
+	d, err := runner.CfgValue().DString("", "components", "broker", option)
 	if err != nil {
 		return err
 	}
@@ -30,7 +29,7 @@ func (b *broker) setURI(opts options.Options, runner string, cfg *value.Value) e
 	opts.SetOption(
 		option,
 		"BROKER_URI",
-		runner,
+		runner.Name(),
 		d,
 	)
 
@@ -50,10 +49,10 @@ func (b *broker) setURI(opts options.Options, runner string, cfg *value.Value) e
 	return nil
 }
 
-func (b *broker) setBindings(cfg *value.Value) error {
+func (b *broker) setBindings(runner *runner.Runner) error {
 	bindings := make(map[string][]*regexp.Regexp)
 
-	vm, err := cfg.MapString("bindings")
+	vm, err := runner.CfgValue().MapString("components", "broker", "bindings")
 	if err != nil {
 		return err
 	}
@@ -90,20 +89,15 @@ func (b *broker) setBindings(cfg *value.Value) error {
 
 // Build AFAIRE
 func Build(opts options.Options, runner *runner.Runner) (interface{}, error) {
-	cfg, err := runner.ComponentCfg("broker")
-	if err != nil {
-		return nil, err
-	}
-
 	broker := &broker{
 		runner: runner,
 	}
 
-	if err := broker.setURI(opts, runner.Name(), cfg); err != nil {
+	if err := broker.setURI(opts, runner); err != nil {
 		return nil, err
 	}
 
-	if err := broker.setBindings(cfg); err != nil {
+	if err := broker.setBindings(runner); err != nil {
 		return nil, err
 	}
 

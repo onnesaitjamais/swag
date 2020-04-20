@@ -16,7 +16,6 @@ import (
 	"github.com/arnumina/swag/runner"
 	"github.com/arnumina/swag/util/failure"
 	"github.com/arnumina/swag/util/options"
-	"github.com/arnumina/swag/util/value"
 )
 
 const (
@@ -94,10 +93,10 @@ func defaultOutBuilder(t string, opts options.Options) (Output, error) {
 	}
 }
 
-func (l *logger) setLevel(opts options.Options, runner string, cfg *value.Value) error {
+func (l *logger) setLevel(opts options.Options, runner *runner.Runner) error {
 	const option = "level"
 
-	d, err := cfg.DString(_defaultLevel, option)
+	d, err := runner.CfgValue().DString(_defaultLevel, "components", "logger", option)
 	if err != nil {
 		return err
 	}
@@ -105,7 +104,7 @@ func (l *logger) setLevel(opts options.Options, runner string, cfg *value.Value)
 	opts.SetOption(
 		option,
 		"LOGGER_LEVEL",
-		runner,
+		runner.Name(),
 		d,
 	)
 
@@ -119,10 +118,10 @@ func (l *logger) setLevel(opts options.Options, runner string, cfg *value.Value)
 	return nil
 }
 
-func (l *logger) setEncoder(opts options.Options, runner string, cfg *value.Value) error {
+func (l *logger) setEncoder(opts options.Options, runner *runner.Runner) error {
 	const option = "encoder"
 
-	d, err := cfg.DString(_defaultEncoder, option)
+	d, err := runner.CfgValue().DString(_defaultEncoder, "components", "logger", option)
 	if err != nil {
 		return err
 	}
@@ -130,7 +129,7 @@ func (l *logger) setEncoder(opts options.Options, runner string, cfg *value.Valu
 	opts.SetOption(
 		option,
 		"LOGGER_ENCODER",
-		runner,
+		runner.Name(),
 		d,
 	)
 
@@ -156,10 +155,10 @@ func (l *logger) setEncoder(opts options.Options, runner string, cfg *value.Valu
 	return nil
 }
 
-func (l *logger) setOutputFileName(opts options.Options, runner string, cfg *value.Value) error {
+func (l *logger) setOutputFileName(opts options.Options, runner *runner.Runner) error {
 	const option = "output_file_name"
 
-	d, err := cfg.DString(_defaultOutputFileName, option)
+	d, err := runner.CfgValue().DString(_defaultOutputFileName, "components", "logger", option)
 	if err != nil {
 		return err
 	}
@@ -167,17 +166,17 @@ func (l *logger) setOutputFileName(opts options.Options, runner string, cfg *val
 	opts.SetOption(
 		option,
 		"LOGGER_OUTPUT_FILE_NAME",
-		runner,
+		runner.Name(),
 		d,
 	)
 
 	return nil
 }
 
-func (l *logger) setOutputSyslogFacility(opts options.Options, runner string, cfg *value.Value) error {
+func (l *logger) setOutputSyslogFacility(opts options.Options, runner *runner.Runner) error {
 	const option = "output_syslog_facility"
 
-	d, err := cfg.DString(_defaultOutputSyslogFacility, option)
+	d, err := runner.CfgValue().DString(_defaultOutputSyslogFacility, "components", "logger", option)
 	if err != nil {
 		return err
 	}
@@ -185,17 +184,17 @@ func (l *logger) setOutputSyslogFacility(opts options.Options, runner string, cf
 	opts.SetOption(
 		option,
 		"LOGGER_OUTPUT_SYSLOG_FACILITY",
-		runner,
+		runner.Name(),
 		d,
 	)
 
 	return nil
 }
 
-func (l *logger) setOutput(opts options.Options, runner string, cfg *value.Value) error {
+func (l *logger) setOutput(opts options.Options, runner *runner.Runner) error {
 	const option = "output"
 
-	d, err := cfg.DString(_defaultOutput, option)
+	d, err := runner.CfgValue().DString(_defaultOutput, "components", "logger", option)
 	if err != nil {
 		return err
 	}
@@ -203,7 +202,7 @@ func (l *logger) setOutput(opts options.Options, runner string, cfg *value.Value
 	opts.SetOption(
 		option,
 		"LOGGER_OUTPUT",
-		runner,
+		runner.Name(),
 		d,
 	)
 
@@ -231,34 +230,29 @@ func (l *logger) setOutput(opts options.Options, runner string, cfg *value.Value
 
 // Build AFAIRE
 func Build(opts options.Options, runner *runner.Runner) (interface{}, error) {
-	cfg, err := runner.ComponentCfg("logger")
-	if err != nil {
-		return nil, err
-	}
-
 	logger := &logger{
 		runner: fmt.Sprintf("%s.%s", runner.Name(), runner.ID()[:8]),
 	}
 
 	//////////////// Il faudrait ajouter l'appel d'une callback pour les options des builders externes /////////////////
 
-	if err := logger.setLevel(opts, runner.Name(), cfg); err != nil {
+	if err := logger.setLevel(opts, runner); err != nil {
 		return nil, err
 	}
 
-	if err := logger.setEncoder(opts, runner.Name(), cfg); err != nil {
+	if err := logger.setEncoder(opts, runner); err != nil {
 		return nil, err
 	}
 
-	if err := logger.setOutputFileName(opts, runner.Name(), cfg); err != nil {
+	if err := logger.setOutputFileName(opts, runner); err != nil {
 		return nil, err
 	}
 
-	if err := logger.setOutputSyslogFacility(opts, runner.Name(), cfg); err != nil {
+	if err := logger.setOutputSyslogFacility(opts, runner); err != nil {
 		return nil, err
 	}
 
-	if err := logger.setOutput(opts, runner.Name(), cfg); err != nil {
+	if err := logger.setOutput(opts, runner); err != nil {
 		return nil, err
 	}
 

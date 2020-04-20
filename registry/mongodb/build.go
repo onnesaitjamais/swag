@@ -16,17 +16,16 @@ import (
 	"github.com/arnumina/swag/runner"
 	"github.com/arnumina/swag/util/failure"
 	"github.com/arnumina/swag/util/options"
-	"github.com/arnumina/swag/util/value"
 )
 
 const (
 	_defaultInterval = 30
 )
 
-func (r *registry) setInterval(opts options.Options, runner string, cfg *value.Value) error {
+func (r *registry) setInterval(opts options.Options, runner *runner.Runner) error {
 	const option = "interval"
 
-	d, err := cfg.DInt(_defaultInterval, option)
+	d, err := runner.CfgValue().DInt(_defaultInterval, "components", "registry", option)
 	if err != nil {
 		return err
 	}
@@ -34,7 +33,7 @@ func (r *registry) setInterval(opts options.Options, runner string, cfg *value.V
 	opts.SetOption(
 		option,
 		"REGISTRY_INTERVAL",
-		runner,
+		runner.Name(),
 		d,
 	)
 
@@ -48,10 +47,10 @@ func (r *registry) setInterval(opts options.Options, runner string, cfg *value.V
 	return nil
 }
 
-func (r *registry) setURI(opts options.Options, runner string, cfg *value.Value) error {
+func (r *registry) setURI(opts options.Options, runner *runner.Runner) error {
 	const option = "URI"
 
-	d, err := cfg.DString("", option)
+	d, err := runner.CfgValue().DString("", "components", "registry", option)
 	if err != nil {
 		return err
 	}
@@ -59,7 +58,7 @@ func (r *registry) setURI(opts options.Options, runner string, cfg *value.Value)
 	opts.SetOption(
 		option,
 		"REGISTRY_URI",
-		runner,
+		runner.Name(),
 		d,
 	)
 
@@ -81,20 +80,15 @@ func (r *registry) setURI(opts options.Options, runner string, cfg *value.Value)
 
 // Build AFAIRE
 func Build(opts options.Options, runner *runner.Runner) (interface{}, error) {
-	cfg, err := runner.ComponentCfg("registry")
-	if err != nil {
-		return nil, err
-	}
-
 	registry := &registry{
 		runner: runner,
 	}
 
-	if err := registry.setInterval(opts, runner.Name(), cfg); err != nil {
+	if err := registry.setInterval(opts, runner); err != nil {
 		return nil, err
 	}
 
-	if err := registry.setURI(opts, runner.Name(), cfg); err != nil {
+	if err := registry.setURI(opts, runner); err != nil {
 		return nil, err
 	}
 
